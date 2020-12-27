@@ -2,13 +2,15 @@
 
 import os
 import pickle
+from PIL import Image
+import shutil
 import time
-from tkinter import Tk
 from tkinter  import filedialog
-from shutil import copyfile
+from tkinter import Tk
 
 extension = ".jpg"
 file_path = os.path.dirname(__file__)
+temp_path = os.path.join(file_path , "temp")
 
 def main():
 
@@ -22,19 +24,37 @@ def main():
         pckl_data = create_pckl_data()
 
     windows_spotlight_path = fr"C:\Users\{pckl_data.username}\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets\\"
-    
-    count = 0
+
+    if not os.path.isdir(temp_path):
+        os.mkdir(temp_path)
+
+    # Add an extension to each file and move it to a temp dir
     for f in os.listdir(windows_spotlight_path):
 
         if os.path.getmtime(windows_spotlight_path + f) < pckl_data.time:
             continue
 
         else:
-            copyfile(windows_spotlight_path + f, os.path.join(pckl_data.directory, f + extension))
+            shutil.copyfile(windows_spotlight_path + f, os.path.join(temp_path, f + extension))
+    
+    # Only store the horizontal oriented images
+    count = 0
+    for f in os.listdir(temp_path):
+        im = Image.open(os.path.join(temp_path, f))
+
+        if im.width > im.height:
+            shutil.copyfile(os.path.join(temp_path, f), 
+                            os.path.join(pckl_data.directory, f))
             count += 1
 
-    print(f"{count} new images added")
+        im.close()
 
+    print(f"{count} new images added.")
+
+    # Delete temp directory
+    shutil.rmtree(temp_path)
+
+    # Store and update pckl_data
     pckl_data.update_time()
     pckl_data.dump()
 
