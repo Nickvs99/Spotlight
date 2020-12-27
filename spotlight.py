@@ -18,17 +18,8 @@ def main():
         f = open(os.path.join(file_path,'store.pckl'), 'rb')
         pckl_data = pickle.load(f)
         f.close()
-    else:
-
-        username = input("Your windows username: ")
-
-        print("Select your designated copy folder...")
-        Tk()
-        directory = filedialog.askdirectory()
-
-        # Since this is the first instance of the pckl_data,
-        # set the time to the epoch of time
-        pckl_data = PickleData(username, directory, time=0)
+    else: 
+        pckl_data = create_pckl_data()
 
     windows_spotlight_path = fr"C:\Users\{pckl_data.username}\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets\\"
     
@@ -67,6 +58,51 @@ class PickleData():
         f = open(os.path.join(file_path, filename), 'wb')
         pickle.dump(self, f)
         f.close()
+
+def create_pckl_data():
+    """
+    Create a new PickleData object. The object stores the user preferences.
+    """
+
+    username = ask_username()
+
+    directory = ask_directory()
+
+    # Since this is the first instance of the pckl_data,
+    # set the time to the epoch of time
+    pckl_data = PickleData(username, directory, time=0)
+
+    return pckl_data
+
+def ask_username():
+    """
+    Asks the user for a valid windows username.
+    """
+    username = input("Your windows username: ")
+
+    while not os.path.isdir(fr"C:\Users\{username}"):
+        print(("Invalid windows username. Please enter a valid windows "
+               "username. If you are unsure what your username is go towards: "
+               r"'C:\Users\'. In this directory will be your windows username."))
+
+        username = input("Your windows username: ")
+
+    return username
+
+def ask_directory():
+    """
+    Asks the user for a valid designated copy folder.
+    """
+
+    print("Select your designated copy folder...")
+
+    directory = filedialog.askdirectory()
+    while directory == "":
+        print("No selection found. Please select a designated copy folder")
+        directory = filedialog.askdirectory()
+
+    return directory
+
 
 if __name__ == "__main__":
     main()
