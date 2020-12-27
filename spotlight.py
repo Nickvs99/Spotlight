@@ -25,6 +25,8 @@ def main():
 
     windows_spotlight_path = fr"C:\Users\{pckl_data.username}\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets\\"
 
+    print("Gathering windows spotlight images...")
+
     if not os.path.isdir(temp_path):
         os.mkdir(temp_path)
 
@@ -59,6 +61,8 @@ def main():
     pckl_data.dump()
 
     os.startfile(pckl_data.directory)
+
+    input("Press enter to exit.")
 
 class PickleData():
 
@@ -115,7 +119,10 @@ def ask_directory():
     """
 
     print("Select your designated copy folder...")
-
+    
+    # Withdraw tkinter dialog when user has a directory selected
+    Tk().withdraw()
+    
     directory = filedialog.askdirectory()
     while directory == "":
         print("No selection found. Please select a designated copy folder")
